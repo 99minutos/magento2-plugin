@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <NoventaYNueveMinutos_NextDay>
+                <active>1</active>
+                <title>99 minutos</title>
+                <name>Entrega de 2 a 3 días hábiles</name>
+                <shipping_cost>10</shipping_cost>
+                <sort_order>15</sort_order>
+                <model>NoventaYNueveMinutos\NextDay\Model\Carrier\NextDayShipping</model>
+            </NoventaYNueveMinutos_NextDay>
+        </carriers>
+    </default>
+</config>
