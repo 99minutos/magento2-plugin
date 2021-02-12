@@ -64,13 +64,13 @@ class Orderplaceafter implements ObserverInterface
                 "country" => $shippingAddress->getCountryId(),
             ];
 
-            $this->curl->post("https://wandering-pebble-vxtl96hwkcmo.vapor-farm-c1.com/api/set/orders", $payload);
+            $this->curl->post("https://magento.99minutos.app/api/set/orders", $payload);
 
             $result = $this->curl->getBody();
 
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage());
-            $this->curl->post("https://wandering-pebble-vxtl96hwkcmo.vapor-farm-c1.com/api/set/orders", ['error' => $e->getMessage()]);
+            $this->curl->post("https://magento.99minutos.app/api/set/orders", ['error' => $e->getMessage()]);
         }
     }
 }

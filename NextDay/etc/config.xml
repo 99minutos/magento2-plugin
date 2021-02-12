@@ -6,7 +6,11 @@
                 <active>1</active>
                 <title>99 minutos</title>
                 <name>Entrega de 2 a 3 días hábiles</name>
-                <shipping_cost>10</shipping_cost>
+                <shipping_cost_xs>75</shipping_cost_xs>
+                <shipping_cost_s>85</shipping_cost_s>
+                <shipping_cost_m>95</shipping_cost_m>
+                <shipping_cost_l>105</shipping_cost_l>
+                <shipping_cost_xl>175</shipping_cost_xl>
                 <sort_order>15</sort_order>
                 <model>NoventaYNueveMinutos\NextDay\Model\Carrier\NextDayShipping</model>
             </NoventaYNueveMinutos_NextDay>

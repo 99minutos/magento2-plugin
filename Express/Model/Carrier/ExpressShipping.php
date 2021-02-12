@@ -75,7 +75,7 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
 
         try{
             $apikey = $this->getConfigData('apikey');
-
+            $cartWeight = $request->getPackageWeight();
             $data = $request->getData();
 
             $payload = [
@@ -83,7 +83,7 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
                 "data" => $data,
             ];
 
-            $this->curl->post("https://wandering-pebble-vxtl96hwkcmo.vapor-farm-c1.com/api/rates", $payload);
+            $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
 
             $result = $this->curl->getBody();
 
@@ -108,7 +108,16 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
         $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
-        $shippingCost = (float)$this->getConfigData('shipping_cost');
+        $shippingCost = $this->getPackageSizeCost($cartWeight,
+            $this->getConfigData('shipping_cost_xs'),
+            $this->getConfigData('shipping_cost_s'),
+            $this->getConfigData('shipping_cost_m'),
+            $this->getConfigData('shipping_cost_l')
+        );
+
+        if($shippingCost == 'Package size not allowed'){
+            return false;
+        }
 
         $method->setPrice($shippingCost);
         $method->setCost($shippingCost);
@@ -125,4 +134,23 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
     {
         return [$this->_code => $this->getConfigData('name')];
     }
+
+    private function getPackageSizeCost($weight, $xs, $s, $m, $l){
+        if($weight == 0){
+            return $m;
+        }
+        if (0<$weight && $weight<=1){
+            return $xs;
+        }elseif (1<$weight && $weight<=2){
+            return $s;
+        }elseif (2<$weight && $weight<=3){
+            return $m;
+        }elseif (3<$weight && $weight<=5){
+            return $l;
+        }else{
+            return "Package size not allowed";
+        }
+
+    }
+
 }

@@ -6,8 +6,11 @@
                 <active>1</active>
                 <title>99 minutos</title>
                 <name>Entrega en menos de 99 minutos</name>
-                <shipping_cost>10</shipping_cost>
-                <sort_order>15</sort_order>
+                <shipping_cost_xs>105</shipping_cost_xs>
+                <shipping_cost_s>115</shipping_cost_s>
+                <shipping_cost_m>125</shipping_cost_m>
+                <shipping_cost_l>285</shipping_cost_l>
+                <sort_order>20</sort_order>
                 <model>NoventaYNueveMinutos\Express\Model\Carrier\ExpressShipping</model>
             </NoventaYNueveMinutos_Express>
         </carriers>

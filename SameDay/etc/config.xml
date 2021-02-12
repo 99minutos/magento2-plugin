@@ -6,7 +6,11 @@
                 <active>1</active>
                 <title>99 minutos</title>
                 <name>Entrega el mismo día</name>
-                <shipping_cost>10</shipping_cost>
+                <shipping_cost_xs>85</shipping_cost_xs>
+                <shipping_cost_s>95</shipping_cost_s>
+                <shipping_cost_m>105</shipping_cost_m>
+                <shipping_cost_l>115</shipping_cost_l>
+                <shipping_cost_xl>205</shipping_cost_xl>
                 <sort_order>15</sort_order>
                 <model>NoventaYNueveMinutos\SameDay\Model\Carrier\SameDayShipping</model>
             </NoventaYNueveMinutos_SameDay>

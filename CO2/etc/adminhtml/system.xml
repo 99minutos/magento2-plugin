@@ -17,8 +17,24 @@
                 <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Method Name</label>
                 </field>
-                <field id="shipping_cost" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Shipping Cost</label>
+                <field id="shipping_cost_xs" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Shipping Cost xs</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="shipping_cost_s" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Shipping Cost s</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="shipping_cost_m" translate="label" type="text" sortOrder="42" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Shipping Cost m</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="shipping_cost_l" translate="label" type="text" sortOrder="43" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Shipping Cost l</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="shipping_cost_xl" translate="label" type="text" sortOrder="44" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Shipping Cost xl</label>
                     <validate>validate-number validate-zero-or-greater</validate>
                 </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
