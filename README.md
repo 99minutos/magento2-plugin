@@ -10,6 +10,4 @@ Now it is available in the shipping methods section and should work after you co
 
 # Remember
 Before installing the plugin you must have an active register in: 
-https://wandering-pebble-vxtl96hwkcmo.vapor-farm-c1.com/register
-
-(We wil use another URL soon)
+https://magento.99minutos.app/register
