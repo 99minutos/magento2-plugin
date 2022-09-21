@@ -11,6 +11,10 @@
                 <field id="apikey" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>API key</label>
                 </field>
+                <field id="environment" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Environment</label>
+                    <source_model>NoventaYNueveMinutos\Config\Environments</source_model>
+                </field>
                 <field id="title" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Title</label>
                 </field>
