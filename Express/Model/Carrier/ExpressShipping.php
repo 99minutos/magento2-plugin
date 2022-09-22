@@ -8,7 +8,8 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Framework\HTTP\Client\Curl as Curl;
-
+use Psr\Log\LoggerInterface;
+use NoventaYNueveMinutos\Helper\Data as Helper;
 /**
  * Custom shipping model
  */
@@ -52,13 +53,16 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
         Curl $curl,
-        array $data = []
+        array $data = [],
+        Helper $helperData
     ) {
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->curl = $curl;
+        $this->_logger = $logger;
+        $this->_99Helper = $helperData;
     }
 
     /**
@@ -69,23 +73,47 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/99MinutosRates.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $this->_logger = $logger;
+        $this->_logger->debug('**************************');
+        $this->_logger->debug('ExpressShipping');
+
+        $this->_logger->debug('ExpressShipping - getConfigFlag');
+        $this->_logger->debug($this->getConfigFlag('active'));
+
         if (!$this->getConfigFlag('active')) {
+            $this->_logger->debug('ExpressShipping - no pasó el config flag');
             return false;
         }
 
         try{
             $apikey = $this->getConfigData('apikey');
-            $cartWeight = $request->getPackageWeight();
             $data = $request->getData();
+            $cartWeight = $request->getPackageWeight();
+
+            $this->_logger->debug('ExpressShipping - apikey');
+            $this->_logger->debug($apikey);
+
+            $this->_logger->debug('ExpressShipping - data');
+            $this->_logger->debug(json_encode($data));
 
             $payload = [
                 "apikey" => $apikey,
+                "env" => $this->_99Helper->getEnvironment('carriers/NoventaYNueveMinutos_Express/environment'),
                 "data" => $data,
             ];
+
+            $this->_logger->debug('ExpressShipping - request');
+            $this->_logger->debug(json_encode($payload));
 
             $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
 
             $result = $this->curl->getBody();
+
+            $this->_logger->debug('ExpressShipping - response');
+            $this->_logger->debug(json_encode($result));
 
             $codes = json_decode($result, true)['codes'];
 
@@ -93,6 +121,9 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
                 return false;
             }
         }catch (\Exception $e){
+            $this->_logger->debug('ExpressShipping - EXCEPTION');
+            $this->_logger->debug(json_encode($e));
+            $this->_logger->debug(json_encode($e->getMessage()));
             return false;
         }
 

@@ -8,7 +8,8 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Framework\HTTP\Client\Curl as Curl;
-
+use Psr\Log\LoggerInterface;
+use NoventaYNueveMinutos\Helper\Data as Helper;
 /**
  * Custom shipping model
  */
@@ -48,17 +49,20 @@ class SameDayShipping extends AbstractCarrier implements CarrierInterface
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory,
-        \Psr\Log\LoggerInterface $logger,
+        LoggerInterface $logger,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
         Curl $curl,
-        array $data = []
+        array $data = [],
+        Helper $helperData
     ) {
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->curl = $curl;
+        $this->_logger = $logger;
+        $this->_99Helper = $helperData;
     }
 
     /**
@@ -69,24 +73,47 @@ class SameDayShipping extends AbstractCarrier implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/99MinutosRates.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $this->_logger = $logger;
+        $this->_logger->debug('**************************');
+        $this->_logger->debug('SameDayShipping');
+
+        $this->_logger->debug('SameDayShipping - getConfigFlag');
+        $this->_logger->debug($this->getConfigFlag('active'));
+
         if (!$this->getConfigFlag('active')) {
+            $this->_logger->debug('SameDayShipping - no pasó el config flag');
             return false;
         }
 
         try{
             $apikey = $this->getConfigData('apikey');
-
             $data = $request->getData();
             $cartWeight = $request->getPackageWeight();
 
+            $this->_logger->debug('SameDayShipping - apikey');
+            $this->_logger->debug($apikey);
+
+            $this->_logger->debug('SameDayShipping - data');
+            $this->_logger->debug(json_encode($data));
+
             $payload = [
                 "apikey" => $apikey,
+                "env" => $this->_99Helper->getEnvironment('carriers/NoventaYNueveMinutos_SameDay/environment'),
                 "data" => $data,
             ];
+
+            $this->_logger->debug('SameDayShipping - request');
+            $this->_logger->debug(json_encode($payload));
 
             $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
 
             $result = $this->curl->getBody();
+
+            $this->_logger->debug('SameDayShipping - response');
+            $this->_logger->debug(json_encode($result));
 
             $codes = json_decode($result, true)['codes'];
 
@@ -94,6 +121,9 @@ class SameDayShipping extends AbstractCarrier implements CarrierInterface
                 return false;
             }
         }catch(\Exception $e){
+            $this->_logger->debug('SameDayShipping - EXCEPTION');
+            $this->_logger->debug(json_encode($e));
+            $this->_logger->debug(json_encode($e->getMessage()));
             return false;
         }
 
