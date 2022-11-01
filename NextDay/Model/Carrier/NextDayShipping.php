@@ -111,6 +111,11 @@ class NextDayShipping extends AbstractCarrier implements CarrierInterface
             $this->_logger->debug('NextDayShipping - request');
             $this->_logger->debug(json_encode($payload));
 
+            /* FIX CON PLUGIN DHL RATES (https://support.dhlexpresscommerce.com/hc/en-gb/articles/360036285591-Rates-at-checkout-for-Magento-2) */
+            $options = [ ];
+            $this->curl->setOptions($options);
+            /* ***************** */
+
             $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
 
             $result = $this->curl->getBody();
