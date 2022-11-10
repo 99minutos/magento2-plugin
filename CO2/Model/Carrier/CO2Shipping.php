@@ -144,7 +144,26 @@ class CO2Shipping extends AbstractCarrier implements CarrierInterface
         $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
-        $shippingCost = $this->getPackageSizeCost($cartWeight,
+        $free_shipping = $this->getConfigData('free_shipping');
+        $this->_logger->debug('CO2Shipping - free_shipping');
+        $this->_logger->debug($free_shipping);
+
+        $free_from = $this->getConfigData('free_from');
+        $this->_logger->debug('CO2Shipping - free_from');
+        $this->_logger->debug($free_from);
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
+
+        // $subTotal = $cart->getQuote()->getSubtotal();
+        // $this->_logger->debug('CO2Shipping - subTotal');
+        // $this->_logger->debug($subTotal);
+
+        $grandTotal = $cart->getQuote()->getGrandTotal();
+        $this->_logger->debug('CO2Shipping - grandTotal');
+        $this->_logger->debug($grandTotal);
+
+        $shippingCostCo = $this->getPackageSizeCost($cartWeight,
             $this->getConfigData('shipping_cost_xs'),
             $this->getConfigData('shipping_cost_s'),
             $this->getConfigData('shipping_cost_m'),
@@ -152,14 +171,29 @@ class CO2Shipping extends AbstractCarrier implements CarrierInterface
             $this->getConfigData('shipping_cost_xl')
         );
 
-        if($shippingCost == 'Package size not allowed'){
+        if( $free_shipping ){
+            $this->_logger->debug('CO2Shipping - grandTotal >= free_shipping');
+            $this->_logger->debug( $grandTotal >= $free_from );
+
+            if( $grandTotal >= $free_from ){
+                $shippingCostCo = "0";
+            }
+        }
+
+        $this->_logger->debug('CO2Shipping - shippingCost');
+        $this->_logger->debug($shippingCostCo);
+
+        if($shippingCostCo == 'Package size not allowed'){
             return false;
         }
 
-        $method->setPrice($shippingCost);
-        $method->setCost($shippingCost);
+        $method->setPrice($shippingCostCo);
+        $method->setCost($shippingCostCo);
 
         $result->append($method);
+
+        $this->_logger->debug('CO2Shipping - return');
+        $this->_logger->debug(json_encode($result));
 
         return $result;
     }

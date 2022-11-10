@@ -144,21 +144,54 @@ class ExpressShipping extends AbstractCarrier implements CarrierInterface
         $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
-        $shippingCost = $this->getPackageSizeCost($cartWeight,
+        $free_shipping = $this->getConfigData('free_shipping');
+        $this->_logger->debug('ExpressShipping - free_shipping');
+        $this->_logger->debug($free_shipping);
+
+        $free_from = $this->getConfigData('free_from');
+        $this->_logger->debug('ExpressShipping - free_from');
+        $this->_logger->debug($free_from);
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
+
+        // $subTotal = $cart->getQuote()->getSubtotal();
+        // $this->_logger->debug('ExpressShipping - subTotal');
+        // $this->_logger->debug($subTotal);
+
+        $grandTotal = $cart->getQuote()->getGrandTotal();
+        $this->_logger->debug('ExpressShipping - grandTotal');
+        $this->_logger->debug($grandTotal);
+
+        $shippingCostEx = $this->getPackageSizeCost($cartWeight,
             $this->getConfigData('shipping_cost_xs'),
             $this->getConfigData('shipping_cost_s'),
             $this->getConfigData('shipping_cost_m'),
             $this->getConfigData('shipping_cost_l')
         );
 
-        if($shippingCost == 'Package size not allowed'){
+        if( $free_shipping ){
+            $this->_logger->debug('ExpressShipping - grandTotal >= free_shipping');
+            $this->_logger->debug($grandTotal >= $free_from);
+            if( $grandTotal >= $free_from ){
+                $shippingCostEx = "0";
+            }
+        }
+
+        $this->_logger->debug('ExpressShipping - shippingCost');
+        $this->_logger->debug($shippingCostEx);
+
+        if($shippingCostEx == 'Package size not allowed'){
             return false;
         }
 
-        $method->setPrice($shippingCost);
-        $method->setCost($shippingCost);
+        $method->setPrice($shippingCostEx);
+        $method->setCost($shippingCostEx);
 
         $result->append($method);
+
+        $this->_logger->debug('ExpressShipping - return');
+        $this->_logger->debug(json_encode($result));
 
         return $result;
     }

@@ -144,7 +144,26 @@ class SameDayShipping extends AbstractCarrier implements CarrierInterface
         $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
-        $shippingCost = $this->getPackageSizeCost($cartWeight,
+        $free_shipping = $this->getConfigData('free_shipping');
+        $this->_logger->debug('SameDayShipping - free_shipping');
+        $this->_logger->debug($free_shipping);
+
+        $free_from = $this->getConfigData('free_from');
+        $this->_logger->debug('SameDayShipping - free_from');
+        $this->_logger->debug($free_from);
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
+
+        // $subTotal = $cart->getQuote()->getSubtotal();
+        // $this->_logger->debug('SameDayShipping - subTotal');
+        // $this->_logger->debug($subTotal);
+
+        $grandTotal = $cart->getQuote()->getGrandTotal();
+        $this->_logger->debug('SameDayShipping - grandTotal');
+        $this->_logger->debug($grandTotal);
+
+        $shippingCostSD = $this->getPackageSizeCost($cartWeight,
             $this->getConfigData('shipping_cost_xs'),
             $this->getConfigData('shipping_cost_s'),
             $this->getConfigData('shipping_cost_m'),
@@ -152,14 +171,29 @@ class SameDayShipping extends AbstractCarrier implements CarrierInterface
             $this->getConfigData('shipping_cost_xl')
         );
 
-        if($shippingCost == 'Package size not allowed'){
+        if( $free_shipping ){
+            $this->_logger->debug('SameDayShipping - grandTotal >= free_shipping');
+            $this->_logger->debug($grandTotal >= $free_from);
+
+            if( $grandTotal >= $free_from ){
+                $shippingCostSD = "0";
+            }
+        }
+
+        $this->_logger->debug('SameDayShipping - shippingCost');
+        $this->_logger->debug($shippingCostSD);
+
+        if($shippingCostSD == 'Package size not allowed'){
             return false;
         }
 
-        $method->setPrice($shippingCost);
-        $method->setCost($shippingCost);
+        $method->setPrice($shippingCostSD);
+        $method->setCost($shippingCostSD);
 
         $result->append($method);
+
+        $this->_logger->debug('SameDayShipping - return');
+        $this->_logger->debug(json_encode($result));
 
         return $result;
     }

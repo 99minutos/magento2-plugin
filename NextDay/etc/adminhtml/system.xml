@@ -21,6 +21,14 @@
                 <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Method Name</label>
                 </field>
+                <field id="free_shipping" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Envío gratis</label>
+                    <source_model>NoventaYNueveMinutos\Config\FreeShipping</source_model>
+                </field>
+                <field id="free_from" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Cantidad mínima de pedido</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
                 <field id="shipping_cost_xs" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0" >
                     <label>Shipping Cost xs</label>
                     <validate>validate-number validate-zero-or-greater</validate>

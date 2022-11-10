@@ -147,7 +147,26 @@ class NextDayShipping extends AbstractCarrier implements CarrierInterface
         $method->setMethod($this->_code);
         $method->setMethodTitle($this->getConfigData('name'));
 
-        $shippingCost = $this->getPackageSizeCost($cartWeight,
+        $free_shipping = $this->getConfigData('free_shipping');
+        $this->_logger->debug('NextDayShipping - free_shipping');
+        $this->_logger->debug($free_shipping);
+
+        $free_from = $this->getConfigData('free_from');
+        $this->_logger->debug('NextDayShipping - free_from');
+        $this->_logger->debug($free_from);
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
+
+        // $subTotal = $cart->getQuote()->getSubtotal();
+        // $this->_logger->debug('NextDayShipping - subTotal');
+        // $this->_logger->debug($subTotal);
+
+        $grandTotal = $cart->getQuote()->getGrandTotal();
+        $this->_logger->debug('NextDayShipping - grandTotal');
+        $this->_logger->debug($grandTotal);
+
+        $shippingCostND = $this->getPackageSizeCost($cartWeight,
                                                   $this->getConfigData('shipping_cost_xs'),
                                                   $this->getConfigData('shipping_cost_s'),
                                                   $this->getConfigData('shipping_cost_m'),
@@ -155,14 +174,29 @@ class NextDayShipping extends AbstractCarrier implements CarrierInterface
                                                   $this->getConfigData('shipping_cost_xl')
         );
 
-        if($shippingCost == 'Package size not allowed'){
+        if( $free_shipping ){
+            $this->_logger->debug('NextDayShipping - grandTotal >= free_shipping');
+            $this->_logger->debug($grandTotal >= $free_shipping);
+
+            if( $grandTotal >= $free_from ){
+                $shippingCostND = "0";
+            }
+        }
+
+        $this->_logger->debug('NextDayShipping - shippingCost');
+        $this->_logger->debug($shippingCostND);
+
+        if($shippingCostND == 'Package size not allowed'){
             return false;
         }
 
-        $method->setPrice($shippingCost);
-        $method->setCost($shippingCost);
+        $method->setPrice($shippingCostND);
+        $method->setCost($shippingCostND);
 
         $result->append($method);
+
+        $this->_logger->debug('NextDayShipping - return');
+        $this->_logger->debug(json_encode($result));
 
         return $result;
     }
