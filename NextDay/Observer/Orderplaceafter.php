@@ -42,6 +42,12 @@ class Orderplaceafter implements ObserverInterface
 
             $order = $observer->getEvent()->getOrder();
             $orderId = $order->getId();
+            $incrementId = $order->getIncrementId();
+            $this->_logger->debug('Orderplaceafter - orderId');
+            $this->_logger->debug($orderId);
+            $this->_logger->debug('Orderplaceafter - increment ID');
+            $this->_logger->debug($incrementId);
+
             $objectManager = ObjectManager::getInstance();
             $order = $objectManager->create(OrderRepository::class)->get($orderId);
             $shippingAddress = $order->getShippingAddress();
@@ -67,8 +73,8 @@ class Orderplaceafter implements ObserverInterface
             $payload = [
                 "apikey" => $apikey,
                 "env" => $this->_99Helper->getEnvironment('carriers/NoventaYNueveMinutos_NextDay/environment'),
-                "orderNumber" => $orderId,
-                "orderId" => $order->getEntityId(),
+                "orderNumber" => $incrementId,
+                "orderId" => $orderId,
                 "firstName" => $order->getCustomerFirstname(),
                 "lastName" => $order->getCustomerLastname(),
                 "city" => $shippingAddress->getCity(),
