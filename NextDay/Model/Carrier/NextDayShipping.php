@@ -92,8 +92,9 @@ class NextDayShipping extends AbstractCarrier implements CarrierInterface
         }
 
         try{
-            $apikey = $this->getConfigData('apikey');
-            $data = $request->getData();
+            $apikey     = $this->getConfigData('apikey');
+            $env        = $this->getConfigData('environment');
+            $data       = $request->getData();
             $cartWeight = $request->getPackageWeight();
 
             $this->_logger->debug('NextDayShipping - apikey');
@@ -116,7 +117,20 @@ class NextDayShipping extends AbstractCarrier implements CarrierInterface
             $this->curl->setOptions($options);
             /* ***************** */
 
-            $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
+            $this->_logger->debug('NextDayShipping - enviroment');
+            $this->_logger->debug($env);
+
+            if( $env ){
+                $this->_logger->debug('NextDayShipping - url');
+                $this->_logger->debug("https://magento.99minutos.app/api/rates");
+
+                $this->curl->post("https://magento.99minutos.app/api/rates", $payload);
+            }else{
+                $this->_logger->debug('NextDayShipping - url');
+                $this->_logger->debug("https://bubbling-mist-kkispsa6xfhx.vapor-farm-a1.com/api/rates");
+
+                $this->curl->post("https://bubbling-mist-kkispsa6xfhx.vapor-farm-a1.com/api/rates", $payload);
+            }
 
             $result = $this->curl->getBody();
 

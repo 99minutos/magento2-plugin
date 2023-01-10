@@ -63,6 +63,8 @@ class Orderplaceafter implements ObserverInterface
             $this->_logger->debug('Orderplaceafter - apikey');
             $this->_logger->debug($apikey);
 
+            $env = $this->_99Helper->getEnvironment('carriers/NoventaYNueveMinutos_NextDay/environment') == "produccion" ? 1 : 0;
+
             $weight = 0;
 
             foreach($order->getAllItems() as $item)
@@ -93,7 +95,17 @@ class Orderplaceafter implements ObserverInterface
             $this->_logger->debug('Orderplaceafter - request');
             $this->_logger->debug(json_encode($payload));
 
-            $this->curl->post("https://magento.99minutos.app/api/set/orders", $payload);
+            if( $env ){
+                $this->_logger->debug('Orderplaceafter - url');
+                $this->_logger->debug("https://magento.99minutos.app/api/set/orders");
+
+                $this->curl->post("https://magento.99minutos.app/api/set/orders", $payload);
+            }else{
+                $this->_logger->debug('Orderplaceafter - url');
+                $this->_logger->debug("https://bubbling-mist-kkispsa6xfhx.vapor-farm-a1.com/api/set/orders");
+
+                $this->curl->post("https://bubbling-mist-kkispsa6xfhx.vapor-farm-a1.com/api/set/orders", $payload);
+            }
 
             $result = $this->curl->getBody();
 
